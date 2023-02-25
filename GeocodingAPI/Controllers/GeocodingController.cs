@@ -33,6 +33,20 @@ namespace GeocodingAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("GeocodeCoordinate")]
+        public async Task<ActionResult<AddressResult>>GetGeocodeCoordinate([FromQuery] AddresRequest addresRequest)
+        {
+            try
+            {
+                var addressResult = await _geocoding.GeocodeCoordinateAsync(addresRequest);
+
+                return Ok(addressResult);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

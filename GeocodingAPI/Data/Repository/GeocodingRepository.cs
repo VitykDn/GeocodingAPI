@@ -18,14 +18,37 @@ namespace GeocodingAPI.Data.Repository
             _context = context;
         }
 
-        public Task<CoordinateResult> GeocodeCoordinateAsync(AddresRequest addresRequest)
+        public async Task<CoordinateResult> GeocodeCoordinateAsync(AddresRequest addressRequest)
         {
-            throw new NotImplementedException();
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("WebAPI/1.0");
+
+            var requestUrl = $"https://nominatim.openstreetmap.org/search?format=json&street={addressRequest.Address}" +
+                $"&city={addressRequest.City}&state={addressRequest.State}&postalcode={addressRequest.PostalCode}" +
+                $"&country={addressRequest.Country}";
+
+            var response = await _httpClient.GetAsync(requestUrl);
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
+
+            if (result.Count == 0)
+            {
+                throw new Exception("No results found");
+            }
+
+            var coordinatesResult = new CoordinateResult
+            {
+                Latitude = (double)result.lat,
+                Longitude = (double)result.lon
+            };
+
+            return coordinatesResult;
         }
 
         public async Task<AddressResult> GeocodeAddressAsync(CoordinateRequest coordinateRequest)
         {
-            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MyApp/1.0");
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("WebAPI/1.0");
             var longitude = coordinateRequest.Longitude.ToString(CultureInfo.InvariantCulture);
             var latitude = coordinateRequest.Latitude.ToString(CultureInfo.InvariantCulture);
 
@@ -36,10 +59,7 @@ namespace GeocodingAPI.Data.Repository
             response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            //return responseContent;
 
-            //var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            //var result = JsonSerializer.Deserialize<AddressResult>(responseContent, options);
             var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
 
             var addressResult = new AddressResult
