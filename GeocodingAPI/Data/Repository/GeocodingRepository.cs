@@ -18,14 +18,14 @@ namespace GeocodingAPI.Data.Repository
             _context = context;
         }
 
-        public Task<AddressResult> GeocodeCoordinateAsync(AddresRequest addresRequest)
+        public Task<CoordinateResult> GeocodeCoordinateAsync(AddresRequest addresRequest)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<string> GeocodeAddressAsync(CoordinateRequest coordinateRequest)
+        public async Task<AddressResult> GeocodeAddressAsync(CoordinateRequest coordinateRequest)
         {
-            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MyApp/1.0"); // Replace "MyApp/1.0" with your unique identifier
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MyApp/1.0");
             var longitude = coordinateRequest.Longitude.ToString(CultureInfo.InvariantCulture);
             var latitude = coordinateRequest.Latitude.ToString(CultureInfo.InvariantCulture);
 
@@ -50,7 +50,7 @@ namespace GeocodingAPI.Data.Repository
                 PostalCode = result.address.postcode,
                 Country = result.address.country
             };
-            return responseContent;
+            return addressResult;
         }
 
         public async Task AddAdressRequestAsync(AddresRequest addresRequest)
