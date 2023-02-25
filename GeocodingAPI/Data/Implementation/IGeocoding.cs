@@ -4,8 +4,8 @@ namespace GeocodingAPI.Data.Implementation
 {
     public interface IGeocoding
     {
-        public Task<AddressResult> GeocodeAddressAsync(CoordinateRequest coordinateRequest);
-        public Task<AddressResult> GeocodeCordinateAsync(AddresRequest addresRequest);
+        public Task<string> GeocodeAddressAsync(CoordinateRequest coordinateRequest);
+        public Task<AddressResult> GeocodeCoordinateAsync(AddresRequest addresRequest);
 
     }
 }
