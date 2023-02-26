@@ -15,9 +15,8 @@ builder.Services.AddHttpClient();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<WebApiContext>(options =>
     options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
-
 builder.Services.AddScoped<IGeocoding, GeocodingRepository>();
-builder.Services.AddScoped<IGeoCacheAdd, GeocodingRepository>();
+builder.Services.AddScoped<IGeoCache, GeocodingRepository>();
 
 var app = builder.Build();
 

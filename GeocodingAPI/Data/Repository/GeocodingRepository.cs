@@ -1,13 +1,15 @@
 ﻿using GeocodingAPI.Data.Implementation;
 using GeocodingAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Nominatim.API.Models;
 using System.Globalization;
 using System.Net.Http;
 using System.Text.Json;
 
 namespace GeocodingAPI.Data.Repository
 {
-    public class GeocodingRepository : IGeocoding, IGeoCacheAdd
+    public class GeocodingRepository : IGeocoding, IGeoCache
     {
         private readonly HttpClient _httpClient;
         private WebApiContext _context;
@@ -18,7 +20,7 @@ namespace GeocodingAPI.Data.Repository
             _context = context;
         }
 
-        public async Task<CoordinateResult> GeocodeCoordinateAsync(AddresRequest addressRequest)
+        public async Task<CoordinateGeo> GeocodeCoordinateAsync(AddressGeo addressRequest)
         {
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("WebAPI/1.0");
 
@@ -30,23 +32,41 @@ namespace GeocodingAPI.Data.Repository
             response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
+
+            var serializerSettings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+            var result = JsonConvert.DeserializeObject<dynamic>(responseContent,serializerSettings);
 
             if (result.Count == 0)
             {
                 throw new Exception("No results found");
             }
 
-            var coordinatesResult = new CoordinateResult
+            var coordinatesResult = new CoordinateGeo
             {
                 Latitude = (double)result.lat,
                 Longitude = (double)result.lon
             };
+            //var document = JsonDocument.Parse(responseContent);
+            //var root = document.RootElement;
+
+            //if (root.GetArrayLength() == 0)
+            //{
+            //    throw new Exception("No results found");
+            //}
+
+            //var coordinatesResult = new CoordinateGeo
+            //{
+            //    Latitude = root.GetProperty("lat").GetDouble(),
+            //    Longitude = root.GetProperty("lon").GetDouble()
+            //};
 
             return coordinatesResult;
         }
 
-        public async Task<AddressResult> GeocodeAddressAsync(CoordinateRequest coordinateRequest)
+        public async Task<AddressGeo> GeocodeAddressAsync(CoordinateGeo coordinateRequest)
         {
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("WebAPI/1.0");
             var longitude = coordinateRequest.Longitude.ToString(CultureInfo.InvariantCulture);
@@ -62,7 +82,7 @@ namespace GeocodingAPI.Data.Repository
 
             var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
 
-            var addressResult = new AddressResult
+            var addressResult = new AddressGeo
             {
                 Address = result.address.road,
                 City = result.address.city,
@@ -70,33 +90,43 @@ namespace GeocodingAPI.Data.Repository
                 PostalCode = result.address.postcode,
                 Country = result.address.country
             };
+
+            //var result = JsonSerializer.Deserialize<JsonElement>(responseContent);
+
+            //var addressResult = new AddressGeo
+            //{
+            //    Address = result.GetProperty("address").GetProperty("road").GetString(),
+            //    City = result.GetProperty("address").GetProperty("city").GetString(),
+            //    State = result.GetProperty("address").GetProperty("state").GetString(),
+            //    PostalCode = result.GetProperty("address").GetProperty("postcode").GetString(),
+            //    Country = result.GetProperty("address").GetProperty("country").GetString()
+            //};
             return addressResult;
         }
 
-        public async Task AddAdressRequestAsync(AddresRequest addresRequest)
+        public async Task AddAddressRequestAsync(AddressGeo addresRequest)
         {
-            _context.AddresRequests.Add(addresRequest);
+            _context.AddressGeos.Add(addresRequest);
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddAdressResultAsync(AddressResult addressResult)
+        public async Task AddCoordinateRequestAsync(CoordinateGeo coordinateRequest)
         {
-            _context.AddressResults.Add(addressResult);
+            _context.CoordinateGeos.Add(coordinateRequest);
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddCoordinateRequestAsync(CoordinateRequest coordinateRequest)
+        public async Task<CoordinateGeo> GetCoordinateRequestAsync(AddressGeo addressGeo)
         {
-            _context.CoordinateRequests.Add(coordinateRequest);
-            await _context.SaveChangesAsync();
+            var coordinateGeo = await _context.CoordinateGeos
+                .SingleOrDefaultAsync(c => c.Address.Id == addressGeo.Id);
+
+            return coordinateGeo;
         }
 
-        public async Task AddCoordinateResultAsync(CoordinateResult coordinateResult)
+        public Task<AddressGeo> GetAddressRequestAsync(CoordinateGeo coordinateGeo)
         {
-            _context.CoordinateResults.Add(coordinateResult);
-            await _context.SaveChangesAsync();
+            throw new NotImplementedException();
         }
-
-
     }
 }

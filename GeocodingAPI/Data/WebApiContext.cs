@@ -9,10 +9,21 @@ namespace GeocodingAPI.Data
         {
 
         }
-        public DbSet<AddressResult> AddressResults { get; set; }
-        public DbSet<AddresRequest> AddresRequests { get; set; }
-        public DbSet<CoordinateRequest> CoordinateRequests { get; set; }
-        public DbSet<CoordinateResult> CoordinateResults { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AddressGeo>()
+                .HasOne(a => a.Coordinate)
+                .WithOne(c => c.Address)
+                .HasForeignKey<CoordinateGeo>(c => c.AddressId);
+
+            modelBuilder.Entity<CoordinateGeo>()
+                .HasOne(a => a.Address)
+                .WithOne(c => c.Coordinate)
+                .HasForeignKey<AddressGeo>(c => c.CoordinateId);
+        }
+
+        public DbSet<AddressGeo> AddressGeos { get; set; }
+        public DbSet<CoordinateGeo> CoordinateGeos { get; set; }
     }
 
 }
