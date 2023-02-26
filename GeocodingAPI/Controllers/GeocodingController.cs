@@ -34,12 +34,19 @@ namespace GeocodingAPI.Controllers
             }
         }
         [HttpGet("GeocodeAddress")]
-        public async Task<ActionResult<AddressGeo>> GeocodeAddress([FromQuery] CoordinateGeo coordinateRequest)
+        public async Task<ActionResult<AddressGeo>> GeocodeAddress([FromQuery]CoordinateRequest coordinateRequest)
         {
             try
             {
                 var addressResult = await _geocoding.GeocodeAddressAsync(coordinateRequest);
-                await _geocoding.AddCoordinateRequestAsync(coordinateRequest);
+
+                var coordinateResult = new CoordinateGeo()
+                {
+                    Latitude = coordinateRequest.Latitude,
+                    Longitude = coordinateRequest.Longitude,
+                    Address = addressResult
+                };
+                await _geocoding.AddCoordinateRequestAsync(coordinateResult);
                 await _geocoding.AddAddressRequestAsync(addressResult);
                 return Ok(addressResult);
             }
@@ -49,13 +56,22 @@ namespace GeocodingAPI.Controllers
             }
         }
         [HttpGet("GeocodeCoordinate")]
-        public async Task<ActionResult<CoordinateGeo>>GeocodeCoordinate([FromQuery] AddressGeo addresRequest)
+        public async Task<ActionResult<CoordinateGeo>>GeocodeCoordinate([FromQuery] AddressRequest addresRequest)
         {
             try
             {
                 var coordinateResult = await _geocoding.GeocodeCoordinateAsync(addresRequest);
+                var addressResult = new AddressGeo()
+                {
+                    Address = addresRequest.Address,
+                    City = addresRequest.City,
+                    Country = addresRequest.Country,
+                    State = addresRequest.State,
+                    PostalCode = addresRequest.PostalCode,
+                    Coordinate = coordinateResult
+                };
                 await _geocoding.AddCoordinateRequestAsync(coordinateResult);
-                await _geocoding.AddAddressRequestAsync(addresRequest);
+                await _geocoding.AddAddressRequestAsync(addressResult);
                 return Ok(coordinateResult);
             }
             catch (Exception ex)

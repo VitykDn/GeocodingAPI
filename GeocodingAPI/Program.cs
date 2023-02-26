@@ -17,6 +17,7 @@ builder.Services.AddDbContext<WebApiContext>(options =>
     options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
 builder.Services.AddScoped<IGeocoding, GeocodingRepository>();
 builder.Services.AddScoped<IGeoCache, GeocodingRepository>();
+builder.Services.AddScoped<GeocodingRepository>();
 
 var app = builder.Build();
 

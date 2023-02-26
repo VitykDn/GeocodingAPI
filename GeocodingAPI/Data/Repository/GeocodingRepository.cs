@@ -20,7 +20,7 @@ namespace GeocodingAPI.Data.Repository
             _context = context;
         }
 
-        public async Task<CoordinateGeo> GeocodeCoordinateAsync(AddressGeo addressRequest)
+        public async Task<CoordinateGeo> GeocodeCoordinateAsync(AddressRequest addressRequest)
         {
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("WebAPI/1.0");
 
@@ -66,7 +66,7 @@ namespace GeocodingAPI.Data.Repository
             return coordinatesResult;
         }
 
-        public async Task<AddressGeo> GeocodeAddressAsync(CoordinateGeo coordinateRequest)
+        public async Task<AddressGeo> GeocodeAddressAsync(CoordinateRequest coordinateRequest)
         {
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("WebAPI/1.0");
             var longitude = coordinateRequest.Longitude.ToString(CultureInfo.InvariantCulture);
@@ -88,7 +88,7 @@ namespace GeocodingAPI.Data.Repository
                 City = result.address.city,
                 State = result.address.state,
                 PostalCode = result.address.postcode,
-                Country = result.address.country
+                Country = result.address.country,
             };
 
             //var result = JsonSerializer.Deserialize<JsonElement>(responseContent);
@@ -119,7 +119,7 @@ namespace GeocodingAPI.Data.Repository
         public async Task<CoordinateGeo> GetCoordinateRequestAsync(AddressGeo addressGeo)
         {
             var coordinateGeo = await _context.CoordinateGeos
-                .SingleOrDefaultAsync(c => c.Address.Id == addressGeo.Id);
+                .SingleOrDefaultAsync(c => c.AddressId == addressGeo.Id);
 
             return coordinateGeo;
         }

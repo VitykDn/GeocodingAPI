@@ -7,10 +7,11 @@ namespace GeocodingAPI.Models
     public class CoordinateGeo
     {
         [Key]
+        [JsonIgnore]
         public int Id { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-
+        [JsonIgnore]
         public int AddressId { get; set; }
         [JsonIgnore]
         [SwaggerIgnore]
