@@ -15,4 +15,4 @@ Completed technical tasks:
 	The function for obtaining coordinates offers greater flexibility to the user by allowing them to input only the address fields that they know, without the need to fill in all fields. If certain fields are not filled in, the function will return the first set of coordinates that match the provided information. However, it's important to note that when the request is cached, it's stored in its original form, including any null or missing fields. This may result in some inaccuracies or inconsistencies in the cached data, but it allows for a more flexible and user-friendly experience.
 
 Encountered Problems
-- Creating unit tests 
+- While creating unit tests, I encountered certain problems, as a result, I did not have time to complete this task, as a sample there are non-working examples of tests.
