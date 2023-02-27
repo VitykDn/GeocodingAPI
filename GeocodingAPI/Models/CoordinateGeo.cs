@@ -12,9 +12,8 @@ namespace GeocodingAPI.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         [JsonIgnore]
-        public int AddressId { get; set; }
+        public int? AddressId { get; set; }
         [JsonIgnore]
-        [SwaggerIgnore]
-        public AddressGeo Address { get; set; }
+        public AddressGeo? Address { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using GeocodingAPI.Data.Implementation;
-using GeocodingAPI.Data.Repository;
+﻿using GeocodingAPI.Data.Repository;
 using GeocodingAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,74 +10,82 @@ namespace GeocodingAPI.Controllers
     [ApiController]
     public class GeocodingController : ControllerBase
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly GeocodingRepository _geocoding;
+        private readonly ILogger<GeocodingController> _logger;
 
-        public GeocodingController(IWebHostEnvironment webHostEnvironment, IGeoCache geoCacheAdd,
-            GeocodingRepository geocoding)
+        public GeocodingController(GeocodingRepository geocoding, ILogger<GeocodingController> logger)
         {
-            _webHostEnvironment = webHostEnvironment;
             _geocoding = geocoding;
+            _logger = logger;
         }
-        [HttpGet("GetCoordinate")]
-        public async Task<ActionResult<CoordinateGeo>> GetGeoCoordinateTest( AddressGeo addressRequest)
-        {
-            try
-            {
-                var coordinateResult = await _geocoding.GetCoordinateRequestAsync(addressRequest);
-                return Ok(coordinateResult);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+
+
+        /// <summary>
+        /// Handles the HTTP GET request to geocode an address.
+        /// </summary>
+        /// <param name="coordinateRequest"></param>
+        /// <returns></returns>
         [HttpGet("GeocodeAddress")]
-        public async Task<ActionResult<AddressGeo>> GeocodeAddress([FromQuery]CoordinateRequest coordinateRequest)
+        public async Task<ActionResult<AddressGeo>> GetGeocodeAddress([FromQuery] CoordinateRequest coordinateRequest)
         {
             try
             {
                 var addressResult = await _geocoding.GeocodeAddressAsync(coordinateRequest);
 
-                var coordinateResult = new CoordinateGeo()
-                {
-                    Latitude = coordinateRequest.Latitude,
-                    Longitude = coordinateRequest.Longitude,
-                    Address = addressResult
-                };
-                await _geocoding.AddCoordinateRequestAsync(coordinateResult);
-                await _geocoding.AddAddressRequestAsync(addressResult);
+                await _geocoding.SaveFromAddressResultAsync(coordinateRequest, addressResult);
+                _logger.LogInformation($"GeocodeAddress success for {coordinateRequest.Latitude},{coordinateRequest.Longitude}");
+
                 return Ok(addressResult);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"GeocodeAddress error for {coordinateRequest.Latitude},{coordinateRequest.Longitude}");
+
                 return BadRequest(ex.Message);
             }
         }
+        /// <summary>
+        /// Handles the HTTP GET request to geocode a coordinates.
+        /// </summary>
+        /// <param name="addressRequest"></param>
+        /// <returns></returns>
         [HttpGet("GeocodeCoordinate")]
-        public async Task<ActionResult<CoordinateGeo>>GeocodeCoordinate([FromQuery] AddressRequest addresRequest)
+        public async Task<ActionResult<CoordinateGeo>> GetGeocodeCoordinate([FromQuery] AddressRequest addressRequest)
         {
             try
             {
-                var coordinateResult = await _geocoding.GeocodeCoordinateAsync(addresRequest);
-                var addressResult = new AddressGeo()
-                {
-                    Address = addresRequest.Address,
-                    City = addresRequest.City,
-                    Country = addresRequest.Country,
-                    State = addresRequest.State,
-                    PostalCode = addresRequest.PostalCode,
-                    Coordinate = coordinateResult
-                };
-                await _geocoding.AddCoordinateRequestAsync(coordinateResult);
-                await _geocoding.AddAddressRequestAsync(addressResult);
+                var coordinateResult = await _geocoding.GeocodeCoordinateAsync(addressRequest);
+
+                await _geocoding.SaveFromCoordinateResultAsync(addressRequest, coordinateResult);
+
+                _logger.LogInformation($"GeocodeCoordinate success for {addressRequest.Address}, {addressRequest.City}, {addressRequest.State}, {addressRequest.Country}");
+
                 return Ok(coordinateResult);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"GeocodeCoordinate error for {addressRequest.Address}, {addressRequest.City}, {addressRequest.State}, {addressRequest.Country}");
                 return BadRequest(ex.Message);
             }
         }
 
+
+
+        ////For Refactoring
+        ////
+        ////
+        //[HttpGet("GetCoordinate")]
+        //public async Task<ActionResult<CoordinateGeo>> GetGeoCoordinateTest(AddressGeo addressRequest)
+        //{
+        //    try
+        //    {
+        //        var coordinateResult = await _geocoding.GetCoordinateRequestAsync(addressRequest);
+        //        return Ok(coordinateResult);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
     }
 }

@@ -1,4 +1,5 @@
-﻿using GeocodingAPI.Models;
+﻿using GeocodingAPI.Data.Implementation;
+using GeocodingAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace GeocodingAPI.Data
