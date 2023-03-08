@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeocodingAPI", "GeocodingAPI\GeocodingAPI.csproj", "{3EF38DBA-7853-4D3A-8C4C-AD912E50AB40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeocodingAPI", "GeocodingAPI\GeocodingAPI.csproj", "{3EF38DBA-7853-4D3A-8C4C-AD912E50AB40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeocodingAPITests", "GeocodingAPITests\GeocodingAPITests.csproj", "{2572C3FB-33E3-4F26-99DF-C3444863BA70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{3EF38DBA-7853-4D3A-8C4C-AD912E50AB40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EF38DBA-7853-4D3A-8C4C-AD912E50AB40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EF38DBA-7853-4D3A-8C4C-AD912E50AB40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2572C3FB-33E3-4F26-99DF-C3444863BA70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2572C3FB-33E3-4F26-99DF-C3444863BA70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2572C3FB-33E3-4F26-99DF-C3444863BA70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2572C3FB-33E3-4F26-99DF-C3444863BA70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
